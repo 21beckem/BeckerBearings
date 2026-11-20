@@ -127,7 +127,7 @@ function Invoke-GloveBuild([string]$Platform = 'all') {
         Build-Native $target
         $framework = if ($target -eq 'windows') { 'net10.0-windows10.0.19041.0' } else { 'net10.0-android' }
         $args = @('build', $script:Project, '-f', $framework, '-c', 'Debug', '--no-restore')
-        if ($target -eq 'android') { $args += '-p:RuntimeIdentifier=android-arm64'; $args += "-p:AndroidSdkDirectory=$script:Sdk"; $args += "-p:JavaSdkDirectory=$(Find-JavaHome)" }
+        if ($target -eq 'android') { $args += '-p:RuntimeIdentifier=android-arm64'; $args += '-p:AndroidBuildApplicationPackage=true'; $args += "-p:AndroidSdkDirectory=$script:Sdk"; $args += "-p:JavaSdkDirectory=$(Find-JavaHome)" }
         Invoke-Checked 'dotnet' $args
         $extension = if ($target -eq 'windows') { '*.exe' } else { '*-Signed.apk' }
         $bin = Join-Path $script:Root "src/GloveGo.App/bin/Debug/$framework"

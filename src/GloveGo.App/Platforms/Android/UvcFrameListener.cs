@@ -5,14 +5,13 @@ using GloveGo.App.Services;
 
 namespace GloveGo.App.Platforms.Android;
 
-[Register("com/glovego/app/UvcFrameListener")]
-public sealed class UvcFrameListener(ChannelWriter<CameraFrame> frames) : Java.Lang.Object
+public sealed class UvcFrameListener(ChannelWriter<CameraFrame> frames) : Java.Lang.Object, Com.Serenegiant.Usb.IFrameCallback
 {
-    [Register("onFrame", "(Ljava/nio/ByteBuffer;)V", "")]
-    public void OnFrame(ByteBuffer buffer)
+    public void OnFrame(ByteBuffer? buffer)
     {
         try
         {
+            if (buffer is null) return;
             const int width = 1280, height = 480, rgbxLength = width * height * 4;
             if (buffer.Remaining() < rgbxLength) return;
             var rgbx = new byte[rgbxLength];

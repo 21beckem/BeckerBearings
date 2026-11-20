@@ -42,7 +42,7 @@ internal sealed unsafe class JavaUvcCamera : Java.Lang.Object
             Members.InstanceMethods.InvokeVirtualVoidMethod("setPreviewSize.(IIIIIF)V", this, pointer);
     }
 
-    public void SetFrameCallback(Java.Lang.Object callback, int format)
+    public void SetFrameCallback(Com.Serenegiant.Usb.IFrameCallback callback, int format)
     {
         Span<JniArgumentValue> args = stackalloc JniArgumentValue[2];
         args[0] = new JniArgumentValue(callback); args[1] = new JniArgumentValue(format);

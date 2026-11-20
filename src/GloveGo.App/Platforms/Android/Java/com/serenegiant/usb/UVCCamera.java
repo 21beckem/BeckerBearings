@@ -45,15 +45,15 @@ public final class UVCCamera {
 
     public void close() {
         if (mNativePtr != 0) {
-            nativeStopPreview(mNativePtr);
             nativeRelease(mNativePtr);
         }
     }
 
     public void destroy() {
-        close();
-        if (mNativePtr != 0) nativeDestroy(mNativePtr);
-        mNativePtr = 0;
+        if (mNativePtr != 0) {
+            nativeDestroy(mNativePtr);
+            mNativePtr = 0;
+        }
     }
 
     private native long nativeCreate();
