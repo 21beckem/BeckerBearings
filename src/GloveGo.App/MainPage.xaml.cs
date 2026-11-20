@@ -51,6 +51,7 @@ public partial class MainPage : ContentPage
             DepthStatus.Text = $"Depth complete: {result.ValidPixels:N0} valid pixels, {start.ElapsedMilliseconds} ms";
         }
         catch (Exception ex) { DepthStatus.Text = ex.Message; }
+        finally { await _camera.DisposeAsync(); }
     }
 
     private static byte[] EncodeBmp(byte[] bgr)
