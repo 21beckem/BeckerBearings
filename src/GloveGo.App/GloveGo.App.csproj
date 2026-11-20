@@ -3,6 +3,8 @@
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(GloveGoPlatform)' == 'windows'">net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(GloveGoPlatform)' == 'android'">net10.0-android</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 
@@ -19,6 +21,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
 		<!-- A directly installed Debug APK must contain its managed assemblies. -->
 		<EmbedAssembliesIntoApk Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">true</EmbedAssembliesIntoApk>
@@ -69,7 +72,12 @@
 		<Content Include="..\..\build\native-win\Release\glovego_vision.dll" Condition="Exists('..\..\build\native-win\Release\glovego_vision.dll')" CopyToOutputDirectory="PreserveNewest" Link="glovego_vision.dll" />
 	</ItemGroup>
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<AndroidJavaSource Include="Platforms\Android\Java\**\*.java" />
 		<AndroidNativeLibrary Include="..\..\build\native-android\libglovego_vision.so" Condition="Exists('..\..\build\native-android\libglovego_vision.so')" Abi="arm64-v8a" />
+		<AndroidNativeLibrary Include="..\..\build\native-android\uvc\libUVCCamera.so" Condition="Exists('..\..\build\native-android\uvc\libUVCCamera.so')" Abi="arm64-v8a" />
+		<AndroidNativeLibrary Include="..\..\build\native-android\uvc\libjpeg-turbo1500.so" Condition="Exists('..\..\build\native-android\uvc\libjpeg-turbo1500.so')" Abi="arm64-v8a" />
+		<AndroidNativeLibrary Include="..\..\build\native-android\uvc\libusb100.so" Condition="Exists('..\..\build\native-android\uvc\libusb100.so')" Abi="arm64-v8a" />
+		<AndroidNativeLibrary Include="..\..\build\native-android\uvc\libuvc.so" Condition="Exists('..\..\build\native-android\uvc\libuvc.so')" Abi="arm64-v8a" />
 	</ItemGroup>
 
 </Project>

@@ -9,8 +9,9 @@ Python `cloud-scan/calibration.npz` (640×480 per eye). Whole-frame rotation is 
 The native CMake project requires OpenCV 4.12 with `core`, `imgproc`, and `calib3d`.
 Build it for each target architecture and package `glovego_vision` and its
 OpenCV runtime libraries with the MAUI target. The Android adapter currently uses
-Camera2, which requires the device to expose its external UVC camera through the
-system camera provider; the third-party USB camera app may instead use direct UVC.
+Camera2 for phone cameras and USB cameras exposed by the phone firmware, plus direct
+UVC discovery, permission, and capture for cameras that are only visible through the
+Android USB host APIs.
 Android serial currently supports CDC-ACM devices (including a genuine Uno's
 ATmega16U2), not CH340/CP210x/FTDI clones.
 
@@ -18,6 +19,22 @@ This is the first hardware diagnostic slice. Floor fitting, tracking, map fusion
 continuous capture, and offline replay are subsequent ports.
 
 ## Build
+
+### Developer commands (Windows)
+
+Run `build` in Command Prompt from the repository root to build both platforms.
+Use `build windows` or `build android` for one platform. In PowerShell, run
+`./build.ps1`, `./build.ps1 windows`, or `./build.ps1 android` because PowerShell
+does not search the current directory for commands. Each build first compiles the
+platform's native vision library, then builds the MAUI app and prints the complete
+path to its executable or signed APK.
+
+The command verifies its prerequisites and reports any missing item: .NET 10 with
+the `maui-windows` and `maui-android` workloads, Visual Studio 2026 C++ build tools,
+CMake, Ninja, Java 17, Android SDK API 36, NDK r27c, and OpenCV 4.12 source in
+`vendor/opencv`.
+
+### Manual build notes
 
 Install .NET 10 with the `maui-android` and `maui-windows` workloads, Visual Studio
 C++ tools/CMake, Android SDK API 36, NDK r27c, and OpenCV 4.12 source in
