@@ -1,13 +1,13 @@
-# GloveGo first hardware milestone
+# BeckerBearings first hardware milestone
 
-The `src/GloveGo.App` .NET 10 MAUI project targets Windows and Android. Its diagnostic
+The `src/BeckerBearings.App` .NET 10 MAUI project targets Windows and Android. Its diagnostic
 screen selects a 1280×480 side-by-side stereo camera, processes one frame with
-`native/glovego_vision`, and sends/receives bytes over a selected serial device.
+`native/BeckerBearings_vision`, and sends/receives bytes over a selected serial device.
 The calibration in `Resources/Raw/calibration.json` was transcribed from the
 Python `cloud-scan/calibration.npz` (640×480 per eye). Whole-frame rotation is 180°.
 
 The native CMake project requires OpenCV 4.12 with `core`, `imgproc`, and `calib3d`.
-Build it for each target architecture and package `glovego_vision` and its
+Build it for each target architecture and package `BeckerBearings_vision` and its
 OpenCV runtime libraries with the MAUI target. The Android adapter currently uses
 Camera2 for phone cameras and USB cameras exposed by the phone firmware, plus direct
 UVC discovery, permission, and capture for cameras that are only visible through the
@@ -41,8 +41,8 @@ C++ tools/CMake, Android SDK API 36, NDK r27c, and OpenCV 4.12 source in
 `vendor/opencv`. Configure OpenCV with `BUILD_LIST=core,imgproc,calib3d`,
 `BUILD_SHARED_LIBS=OFF`, `BUILD_TESTS=OFF`, `BUILD_ANDROID_EXAMPLES=OFF`, and
 `BUILD_JAVA=OFF`. Use its build-tree `OpenCVConfig.cmake` with `native/CMakeLists.txt`.
-Windows expects the resulting DLL at `build/native-win/Release/glovego_vision.dll`;
-Android ARM64 expects the `.so` at `build/native-android/libglovego_vision.so`.
+Windows expects the resulting DLL at `build/native-win/Release/BeckerBearings_vision.dll`;
+Android ARM64 expects the `.so` at `build/native-android/libBeckerBearings_vision.so`.
 The MAUI project includes these outputs when present.
 
 The Windows native library has been smoke tested against the Python project's

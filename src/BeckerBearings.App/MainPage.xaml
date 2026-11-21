@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BeckerBearings.App.MainPage" Title="BeckerBearings diagnostics">
+  <ScrollView><VerticalStackLayout Padding="20" Spacing="12">
+    <Label Text="BeckerBearings hardware test" FontSize="24" FontAttributes="Bold" />
+    <Picker x:Name="CameraPicker" Title="Choose stereo camera" ItemDisplayBinding="{Binding Name}" />
+    <Button Text="Refresh devices" Clicked="RefreshClicked" />
+    <Button Text="Capture and calculate depth" Clicked="CaptureClicked" />
+    <Label x:Name="DepthStatus" Text="No depth frame processed" />
+    <Image x:Name="DepthPreview" HeightRequest="240" Aspect="AspectFit" />
+    <Picker x:Name="SerialPicker" Title="Choose Arduino serial device" ItemDisplayBinding="{Binding Name}" />
+    <Entry x:Name="BaudEntry" Text="115200" Keyboard="Numeric" Placeholder="Baud rate" />
+    <Button Text="Open serial" Clicked="OpenSerialClicked" />
+    <Entry x:Name="SendEntry" Text="BeckerBearings echo test" Placeholder="Text to send" />
+    <Button Text="Send and read" Clicked="SendClicked" />
+    <Label x:Name="SerialStatus" Text="Serial disconnected" />
+  </VerticalStackLayout></ScrollView>
+</ContentPage>
