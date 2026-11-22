@@ -43,6 +43,7 @@ public sealed class GroundPlaneEstimator
         if (source.Length < _options.FloorMinInliers) return null;
         var points = source.Length > _options.FloorRansacSamples ? source.OrderBy(_ => _random.Next()).Take(_options.FloorRansacSamples).ToArray() : source;
         var prior = _normal ?? -Vector3.UnitY;
+        var guided = EstimateFromPrior(points);
         var tiltCosine = Math.Cos(DegreesToRadians(_options.FloorMaxTiltDegrees));
         var uprightCosine = Math.Cos(DegreesToRadians(_options.FloorMaxAbsoluteTiltDegrees));
         PlaneCandidate? best = null;
@@ -61,7 +62,29 @@ public sealed class GroundPlaneEstimator
             var refinedCount = points.Count(point => Math.Abs(Vector3.Dot(point, refined.Value.Normal) + refined.Value.Height) <= _options.FloorInlierMeters);
             best = new PlaneCandidate(refined.Value.Normal, refined.Value.Height, refinedCount);
         }
-        return best;
+        return best ?? guided;
+    }
+
+    private PlaneCandidate? EstimateFromPrior(Vector3[] points)
+    {
+        if (_normal is not { } previous || _height is not { } previousHeight) return null;
+        var near = points.Where(point => Math.Abs(Vector3.Dot(point, previous) + (float)previousHeight) <= _options.FloorPriorBandMeters).ToArray();
+        if (near.Length < _options.FloorPriorMinInliers ||
+            near.Max(point => point.X) - near.Min(point => point.X) < _options.FloorPriorMinSpanXMeters ||
+            near.Max(point => point.Z) - near.Min(point => point.Z) < _options.FloorPriorMinSpanZMeters) return null;
+        var refined = FitLeastSquares(near);
+        if (refined is null) return null;
+        var normal = refined.Value.Normal; var height = refined.Value.Height;
+        var inliers = points.Count(point => Math.Abs(Vector3.Dot(point, normal) + (float)height) <= _options.FloorInlierMeters);
+        var support = points.Where(point => Math.Abs(Vector3.Dot(point, normal) + (float)height) <= _options.FloorInlierMeters).ToArray();
+        if (inliers < _options.FloorPriorMinInliers || inliers < _options.FloorPriorMinFraction * points.Length ||
+            support.Length == 0 || support.Max(point => point.X) - support.Min(point => point.X) < _options.FloorPriorMinSpanXMeters ||
+            support.Max(point => point.Z) - support.Min(point => point.Z) < _options.FloorPriorMinSpanZMeters ||
+            Vector3.Dot(normal, previous) < Math.Cos(DegreesToRadians(_options.FloorPriorMaxTiltDegrees)) ||
+            -normal.Y < Math.Cos(DegreesToRadians(_options.FloorMaxAbsoluteTiltDegrees)) ||
+            Math.Abs(height - previousHeight) > _options.FloorPriorMaxHeightChangeMeters ||
+            height < _options.FloorMinHeightMeters || height > _options.FloorMaxHeightMeters) return null;
+        return new PlaneCandidate(normal, height, inliers);
     }
 
     private static (Vector3 Normal, double Height)? FitLeastSquares(Vector3[] points)

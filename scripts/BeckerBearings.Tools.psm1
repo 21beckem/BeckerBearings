@@ -93,9 +93,9 @@ function Build-Native([string]$Platform) {
         $vsVersion = Split-Path (Split-Path $vs -Parent) -Leaf
         $generator = if ($vsVersion -eq '18') { 'Visual Studio 18 2026' } else { 'Visual Studio 17 2022' }
         if (-not (Test-Path (Join-Path $opencvBuild 'CMakeCache.txt'))) {
-            Invoke-Checked $cmake @('-S', $opencvSource, '-B', $opencvBuild, '-G', $generator, '-A', 'x64', '-DBUILD_LIST=core,imgproc,calib3d', '-DBUILD_SHARED_LIBS=OFF', '-DBUILD_TESTS=OFF', '-DBUILD_PERF_TESTS=OFF', '-DBUILD_EXAMPLES=OFF', '-DBUILD_JAVA=OFF')
+            Invoke-Checked $cmake @('-S', $opencvSource, '-B', $opencvBuild, '-G', $generator, '-A', 'x64', '-DBUILD_LIST=core,imgproc,calib3d,features2d,video', '-DBUILD_SHARED_LIBS=OFF', '-DBUILD_TESTS=OFF', '-DBUILD_PERF_TESTS=OFF', '-DBUILD_EXAMPLES=OFF', '-DBUILD_JAVA=OFF')
         }
-        Invoke-Checked $cmake @('--build', $opencvBuild, '--config', 'Release', '--target', 'opencv_core', 'opencv_imgproc', 'opencv_calib3d')
+        Invoke-Checked $cmake @('--build', $opencvBuild, '--config', 'Release', '--target', 'opencv_core', 'opencv_imgproc', 'opencv_calib3d', 'opencv_features2d', 'opencv_video')
         if (-not (Test-Path (Join-Path $nativeBuild 'CMakeCache.txt'))) {
             Invoke-Checked $cmake @('-S', (Join-Path $script:Root 'native'), '-B', $nativeBuild, '-G', $generator, '-A', 'x64', "-DOpenCV_DIR=$opencvBuild")
         }
@@ -108,9 +108,9 @@ function Build-Native([string]$Platform) {
         $toolchain = Join-Path $ndk 'build/cmake/android.toolchain.cmake'
         $ninja = Find-Ninja
         if (-not (Test-Path (Join-Path $opencvBuild 'CMakeCache.txt'))) {
-            Invoke-Checked $cmake @('-S', $opencvSource, '-B', $opencvBuild, '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$toolchain", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-23', '-DCMAKE_BUILD_TYPE=Release', '-DBUILD_LIST=core,imgproc,calib3d', '-DBUILD_SHARED_LIBS=OFF', '-DBUILD_TESTS=OFF', '-DBUILD_PERF_TESTS=OFF', '-DBUILD_ANDROID_EXAMPLES=OFF', '-DBUILD_JAVA=OFF')
+            Invoke-Checked $cmake @('-S', $opencvSource, '-B', $opencvBuild, '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$toolchain", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-23', '-DCMAKE_BUILD_TYPE=Release', '-DBUILD_LIST=core,imgproc,calib3d,features2d,video', '-DBUILD_SHARED_LIBS=OFF', '-DBUILD_TESTS=OFF', '-DBUILD_PERF_TESTS=OFF', '-DBUILD_ANDROID_EXAMPLES=OFF', '-DBUILD_JAVA=OFF')
         }
-        Invoke-Checked $cmake @('--build', $opencvBuild, '--target', 'opencv_core', 'opencv_imgproc', 'opencv_calib3d')
+        Invoke-Checked $cmake @('--build', $opencvBuild, '--target', 'opencv_core', 'opencv_imgproc', 'opencv_calib3d', 'opencv_features2d', 'opencv_video')
         if (-not (Test-Path (Join-Path $nativeBuild 'CMakeCache.txt'))) {
             Invoke-Checked $cmake @('-S', (Join-Path $script:Root 'native'), '-B', $nativeBuild, '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$toolchain", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-23', '-DCMAKE_BUILD_TYPE=Release', "-DOpenCV_DIR=$opencvBuild")
         }

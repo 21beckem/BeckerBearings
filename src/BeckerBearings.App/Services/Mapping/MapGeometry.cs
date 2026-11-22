@@ -42,7 +42,13 @@ public static class MapGeometry
     }
 
     public static Vector3 CameraToGravity(Vector3 cameraPoint, Matrix4x4 gravityFromCamera, double cameraHeightMeters) =>
-        Vector3.TransformNormal(cameraPoint, gravityFromCamera) + new Vector3(0, (float)cameraHeightMeters, 0);
+        // Matrix4x4 stores the Python rotation rows, while TransformNormal uses
+        // the matrix columns. Apply the rows explicitly to preserve X-right,
+        // Y-up, Z-forward coordinates.
+        new(
+            Vector3.Dot(cameraPoint, new Vector3(gravityFromCamera.M11, gravityFromCamera.M12, gravityFromCamera.M13)),
+            Vector3.Dot(cameraPoint, new Vector3(gravityFromCamera.M21, gravityFromCamera.M22, gravityFromCamera.M23)) + (float)cameraHeightMeters,
+            Vector3.Dot(cameraPoint, new Vector3(gravityFromCamera.M31, gravityFromCamera.M32, gravityFromCamera.M33)));
 
     public static Vector2 GravityToWorldXZ(Vector3 gravityPoint, Pose2D pose)
     {

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using BeckerBearings.App.Services;
 
@@ -7,6 +8,7 @@ public partial class MainPage : ContentPage
 {
     private readonly AppCoordinator _app;
     private CancellationTokenSource? _mappingCancellation;
+    private long _lastMapUiTicks;
 
     public MainPage(AppCoordinator app)
     { InitializeComponent(); _app = app; }
@@ -72,13 +74,22 @@ public partial class MainPage : ContentPage
             MappingStatus.Text = "Starting camera and mapping…";
             await foreach (var frame in _app.RunMappingAsync(selected.Id, _mappingCancellation.Token))
             {
+                var now = Stopwatch.GetTimestamp();
+                if (_lastMapUiTicks != 0 && Stopwatch.GetElapsedTime(_lastMapUiTicks, now) < TimeSpan.FromMilliseconds(66))
+                    continue;
+                _lastMapUiTicks = now;
                 MapPreview.Source = ImageSource.FromStream(() => new MemoryStream(EncodeBmp(frame.Map.Bgr, frame.Map.Width, frame.Map.Height)));
                 var depthMilliseconds = frame.Benchmarks["depth"].MeanMilliseconds ?? 0;
                 MappingStatus.Text = $"Mapping: {frame.Tracking.Correspondences} tracks, {frame.Integration.ObstacleCells} obstacle cells, depth {depthMilliseconds:N0} ms";
             }
         }
         catch (OperationCanceledException) { MappingStatus.Text = "Mapping stopped."; }
-        catch (Exception ex) { MappingStatus.Text = ex.Message; }
+        catch (Exception ex)
+        {
+            File.AppendAllText(Path.Combine(Path.GetTempPath(), "BeckerBearings-mapping.log"),
+                $"[{DateTimeOffset.Now:O}] {ex}{Environment.NewLine}");
+            MappingStatus.Text = $"Mapping failed: {ex.Message}";
+        }
         finally { _mappingCancellation?.Dispose(); _mappingCancellation = null; }
     }
 
