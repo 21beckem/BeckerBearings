@@ -7,6 +7,13 @@
     <Button Text="Capture and calculate depth" Clicked="CaptureClicked" />
     <Label x:Name="DepthStatus" Text="No depth frame processed" />
     <Image x:Name="DepthPreview" HeightRequest="240" Aspect="AspectFit" />
+    <Label Text="Live mapping" FontSize="20" FontAttributes="Bold" />
+    <HorizontalStackLayout Spacing="10">
+      <Button Text="Start live mapping" Clicked="StartMappingClicked" />
+      <Button Text="Stop mapping" Clicked="StopMappingClicked" />
+    </HorizontalStackLayout>
+    <Label x:Name="MappingStatus" Text="Mapping stopped" />
+    <Image x:Name="MapPreview" HeightRequest="360" Aspect="AspectFit" />
     <Picker x:Name="SerialPicker" Title="Choose Arduino serial device" ItemDisplayBinding="{Binding Name}" />
     <Entry x:Name="BaudEntry" Text="115200" Keyboard="Numeric" Placeholder="Baud rate" />
     <Button Text="Open serial" Clicked="OpenSerialClicked" />

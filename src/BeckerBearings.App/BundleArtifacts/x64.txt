@@ -1,0 +1,5 @@
+MainPackage=C:\Users\21bec\local-git\BeckerBearings\src\BeckerBearings.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\BeckerBearings.App_1.0.0.1_x64_Debug.msix
+ResourcePack=C:\Users\21bec\local-git\BeckerBearings\src\BeckerBearings.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\BeckerBearings.App_1.0.0.1_scale-100.msix
+ResourcePack=C:\Users\21bec\local-git\BeckerBearings\src\BeckerBearings.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\BeckerBearings.App_1.0.0.1_scale-125.msix
+ResourcePack=C:\Users\21bec\local-git\BeckerBearings\src\BeckerBearings.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\BeckerBearings.App_1.0.0.1_scale-150.msix
+ResourcePack=C:\Users\21bec\local-git\BeckerBearings\src\BeckerBearings.App\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\BeckerBearings.App_1.0.0.1_scale-400.msix

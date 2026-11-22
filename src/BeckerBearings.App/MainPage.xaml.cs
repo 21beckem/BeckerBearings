@@ -6,6 +6,7 @@ namespace BeckerBearings.App;
 public partial class MainPage : ContentPage
 {
     private readonly AppCoordinator _app;
+    private CancellationTokenSource? _mappingCancellation;
 
     public MainPage(AppCoordinator app)
     { InitializeComponent(); _app = app; }
@@ -40,9 +41,9 @@ public partial class MainPage : ContentPage
         catch (Exception ex) { DepthStatus.Text = ex.Message; }
     }
 
-    private static byte[] EncodeBmp(byte[] bgr)
+    private static byte[] EncodeBmp(byte[] bgr, int width = 320, int height = 240)
     {
-        const int width = 320, height = 240, stride = width * 3;
+        var stride = width * 3;
         var bmp = new byte[54 + bgr.Length];
         bmp[0] = (byte)'B'; bmp[1] = (byte)'M';
         BitConverter.GetBytes(bmp.Length).CopyTo(bmp, 2);
@@ -56,6 +57,32 @@ public partial class MainPage : ContentPage
             Buffer.BlockCopy(bgr, row * stride, bmp, 54 + (height - 1 - row) * stride, stride);
         return bmp;
     }
+
+    private async void StartMappingClicked(object sender, EventArgs e)
+    {
+        if (CameraPicker.SelectedItem is not VideoDevice selected) { MappingStatus.Text = "Select a camera."; return; }
+        if (_mappingCancellation is not null) { MappingStatus.Text = "Mapping is already running."; return; }
+        try
+        {
+#if ANDROID
+            var permission = await Permissions.RequestAsync<Permissions.Camera>();
+            if (permission != PermissionStatus.Granted) throw new InvalidOperationException("Camera permission denied.");
+#endif
+            _mappingCancellation = new CancellationTokenSource();
+            MappingStatus.Text = "Starting camera and mapping…";
+            await foreach (var frame in _app.RunMappingAsync(selected.Id, _mappingCancellation.Token))
+            {
+                MapPreview.Source = ImageSource.FromStream(() => new MemoryStream(EncodeBmp(frame.Map.Bgr, frame.Map.Width, frame.Map.Height)));
+                var depthMilliseconds = frame.Benchmarks["depth"].MeanMilliseconds ?? 0;
+                MappingStatus.Text = $"Mapping: {frame.Tracking.Correspondences} tracks, {frame.Integration.ObstacleCells} obstacle cells, depth {depthMilliseconds:N0} ms";
+            }
+        }
+        catch (OperationCanceledException) { MappingStatus.Text = "Mapping stopped."; }
+        catch (Exception ex) { MappingStatus.Text = ex.Message; }
+        finally { _mappingCancellation?.Dispose(); _mappingCancellation = null; }
+    }
+
+    private void StopMappingClicked(object sender, EventArgs e) => _mappingCancellation?.Cancel();
 
     private async void OpenSerialClicked(object sender, EventArgs e)
     {

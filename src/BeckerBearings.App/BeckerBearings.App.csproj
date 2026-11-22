@@ -22,6 +22,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<!-- Keep the Windows development build directly runnable, as it was before the mapping port. -->
 		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
 		<!-- A directly installed Debug APK must contain its managed assemblies. -->
 		<EmbedAssembliesIntoApk Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">true</EmbedAssembliesIntoApk>
@@ -60,6 +61,8 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<!-- Configuration is loaded explicitly by a future settings workflow, not from the PRI map. -->
+		<MauiAsset Remove="Resources\Raw\config.json" />
 	</ItemGroup>
 
 	<ItemGroup>

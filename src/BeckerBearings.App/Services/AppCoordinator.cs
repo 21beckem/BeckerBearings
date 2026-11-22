@@ -9,6 +9,7 @@ namespace BeckerBearings.App.Services;
 public sealed class AppCoordinator(
     DeviceDiscoveryWorkflow deviceDiscovery,
     CaptureDepthWorkflow depthCapture,
+    LiveMappingWorkflow liveMapping,
     SerialWorkflow serial,
     ICameraService camera,
     ISerialService serialService) : IAsyncDisposable
@@ -17,6 +18,9 @@ public sealed class AppCoordinator(
 
     public Task<DepthCaptureResult> CaptureDepthAsync(string cameraId, CancellationToken cancellationToken) =>
         depthCapture.CaptureAsync(cameraId, cancellationToken);
+
+    public IAsyncEnumerable<MappingFrame> RunMappingAsync(string cameraId, CancellationToken cancellationToken) =>
+        liveMapping.RunAsync(cameraId, cancellationToken);
 
     public Task OpenSerialAsync(string deviceId, int baudRate) => serial.OpenAsync(deviceId, baudRate);
 
